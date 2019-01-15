@@ -399,4 +399,4 @@ export function tutorialReducer(
 
 splice를 사용해 리스트를 삭제하고 있습니다. http통신을 통한 list를 제어할 경우 화면상의 빠른 동작을 위해 리스트 전체를 다시 불러오는게 아니라 삭제된 부분만 클라이언트에서 삭제하는 경우가 많습니다. 
 
-다음번엔 @ngrx/effects 를 공부해보겟습니다.
+다음번엔 @ngrx/effects 를 공부해보겠습니다.
