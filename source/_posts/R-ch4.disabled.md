@@ -407,3 +407,123 @@ summaryBy(
 )
 반환 값은 데이터 프레임이다.
 ```
+
+summary() 는 결과값으로 최솟값, 1사분위수, 중앙값, 평균, 3사분위수, 최댓값을 보여준다. 팩터인 species는 각 레벨마다 몇 개의 값이 있는지를 보여준다.
+
+doBy 패키지의 summaryBy()는 원하는 컬럼의 값을 특정 조건에 따라 요약하는 목적으로 사용한다. 예를 들어, Sepal.Length 와 Sepal.Width를 Species에 따라 살펴보려면 다음과 같이 하면 된다.
+
+```R
+> summaryBy(Sepal.Width + Sepal.Length ~ Species, iris)
+     Species Sepal.Width.mean Sepal.Length.mean
+1     setosa            3.428             5.006
+2 versicolor            2.770             5.936
+3  virginica            2.974             6.588
+```
+
+위 코드에서 'Sepal.Length + Sepal.Length ~ Species' 부분은 포뮬러(수식) 이라고 하는데, 처리할 데이터를 일종의 수학 공식처럼 표현하는 방법이다. 이 예에서는 Sepal.Width와 Sepal.Length를 + 로 연결해 이 두가지에 대한 값을 결과에 각 컬럼으로 놓고, 각 행에는 ~ Species를 사용해 Species를 놓았다. 즉, 위 결과는 Sepal.Width와 Sepal.Length를 Species별로 요약한 것이다.
+
+### orderBy()
+orderBy()는 데이터 프레임을 정렬하는 목적으로 사용한다. orderBy()역시 base 패키지의 order()함수에 대응한다.
+
+```R
+order: 데이터를 정렬하기 위한 순서를 반환한다.
+order(
+  ..., # 정렬할 데이터
+  # na.last는 NA값을 정렬한 결과의 어디에 둘 것인지를 제어한다. 기본값인 na.last=TRUE는
+  # NA 값을 정렬한 결과의 마지막에 둔다. na.last=FALSE는 정렬한 값의 처음에 둔다.
+  # na.last=NA는 NA 값을 정렬 결과에서 제외한다.
+  na.last=TRUE,
+  decreasing=FALSE # 내림차순 여부
+)
+반환 값은 원 데이터에 지정하면 정렬된 결과가 나오도록 하는 색인이다.
+
+orderBy: 포뮬러에 따라 데이터를 정렬한다.
+orderBy(
+  formula, # 정렬할 기준을 지정한 포뮬러
+          # ~의 좌측은 무시하며, ~ 우측에 나열한 이름에 따라 데이터가 정렬된다.
+  data, # 정렬할 데이터
+)
+반환값은 order()와 동일하다.
+```
+
+다음 예는 아이리스 데이터를 Sepal.Length에 따라 정렬했을 때 61행이 가장 처음에 해당함을 보여준다
+
+```R
+> order(iris$Sepal.Width)
+[1] 61 63 69 120 42 ...
+...
+```
+orderBy()는 order()와 유사하지만 정렬할 데이터를 포뮬러로 지정할 수 있다는 점이 편리하다. 다음 예는 모든 데이터를 Sepal.Width로 배열한다. orderBy()에서 ~의 좌측은 무시하므로 적지 않는다.
+
+```R
+> orderBy(~ Sepal.Width, iris)
+  Sepal.Length Sepal.Width Petal.Length Petal.Width    Species
+61          5.0         2.0          3.5         1.0 versicolor
+63          6.0         2.2          4.0         1.0 versicolor
+69          6.2         2.2          4.5         1.5 versicolor
+120         6.0         2.2          5.0         1.5 virginica
+42          4.5         2.3          1.3         0.3    setosa
+...
+```
+
+### sampleBy()
+sampleBy()는 데이터를 그룹으로 묶은 후 각 그룹에서 샘플을 추출하는 함수다. 이 함수는 sample()에 대응하므로 함께 알아보도록 하자
+
+```R
+sample: 샘플링을 수행한다.
+sample(
+  x, # 샘플을 뽑을 데이터 벡터. 만약 길이 1인 숫자 n이 지정되면 1:n에서 샘플이 선택된다.
+  size, # 샘플의 크기
+  replace=FALSE, # 복원 추출 여부
+  prob # 데이터가 뽑힐 가중치. 예를 들어, x=c(1,2,3) 에서 2개의 샘플을 뽑되 각 샘플이 뽑힐 확률을 50%, 20%, 30%로 하고자 한다면 size=2, prob=c(5,2,3) 을 지정한다.
+)
+반환 값은 샘플을 저장한 길이 size인 벡터다
+
+sampleBy: 포뮬러에 따라 데이ㅓ를 그룹으로 묶은 후 샘플을 추출한다.
+sampleBy(
+  formula, # ~ 우측에 나열한 이름에 따라 데이터가 그룹으로 묶인다.
+  frac=0.1, # 추출할 샘플의 비율이며 기본값은 10%
+  replace=FALSE, # 복원 추출 여부
+  data=parent.frame(), # 데이터를 추출할 데이터 프레임
+  systematic=FALSE # 계통 추출을 사용할지 여부
+)
+반환 값은 데이터 프레임이다.
+```
+
+샘플링은 주어진 데이터를 훈련 데이터와 테스트 데이터로 분리하는데 유용하게 사용할 수 있다. 훈련 데이터로부터 모델을 만든 뒤 테스트 데이터에 모델을 적용하면 모델의 정확성을 평가할 수 있다.
+
+평가를 올바르게 하려면 훈련 데이터와 테스트 데이터에 Species값 별로 데이터의 수가 균일한 것이 좋다. 바로 이런 경우에 sampleBy()가 유용하다.
+
+다음은 아이리스 데이터에서 각 Species별로 10%의 데이터를 추출한 예다.
+
+```R
+> sampleBy(~ Species, frac=0.1, data=iris)
+               Sepal.Length Sepal.Width Petal.Length Petal.Width    Species
+setosa.11               5.4         3.7          1.5         0.2     setosa
+setosa.29               5.2         3.4          1.4         0.2     setosa
+setosa.39               4.4         3.0          1.3         0.2     setosa
+setosa.41               5.0         3.5          1.3         0.3     setosa
+setosa.46               4.8         3.0          1.4         0.3     setosa
+versicolor.55           6.5         2.8          4.6         1.5 versicolor
+versicolor.74           6.1         2.8          4.7         1.2 versicolor
+versicolor.82           5.5         2.4          3.7         1.0 versicolor
+versicolor.90           5.5         2.5          4.0         1.3 versicolor
+versicolor.100          5.7         2.8          4.1         1.3 versicolor
+virginica.112           6.4         2.7          5.3         1.9  virginica
+virginica.122           5.6         2.8          4.9         2.0  virginica
+virginica.123           7.7         2.8          6.7         2.0  virginica
+virginica.135           6.1         2.6          5.6         1.4  virginica
+virginica.140           6.9         3.1          5.4         2.1  virginica
+```
+
+## 06 데이터 분리 및 병합
+
+```R
+split: 주어진 기준에 따라 데이터를 분리한다.
+split(
+  x, # 분리할 벡터 또는 데이터 프레임
+  f # 분리할 기준을 저장한 팩터
+)
+반환 값은 분리된 데이터를 저장한 리스트다.
+
+subset: 조건을 만족하는 벡터, 행렬, 데이터 프레임의 일부를 반환한다.

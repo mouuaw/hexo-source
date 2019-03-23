@@ -83,3 +83,6 @@ deploy:
   type: git
   repo: https://github.com/mouuaw/mouuaw.github.io
   branch: master
+
+exclude:
+  - source/_posts/**.disabled.md
