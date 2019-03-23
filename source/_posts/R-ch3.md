@@ -1,5 +1,5 @@
 ---
-title: R-R프로그래밍
+title: R - R프로그래밍
 date: 2019-03-17 01:57:44
 tags:
 - R
