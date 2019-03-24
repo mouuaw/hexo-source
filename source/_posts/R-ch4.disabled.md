@@ -527,3 +527,282 @@ split(
 반환 값은 분리된 데이터를 저장한 리스트다.
 
 subset: 조건을 만족하는 벡터, 행렬, 데이터 프레임의 일부를 반환한다.
+subset(
+  x, # 일부를 취할 객체
+  subset, # 데이터를 취할 것인지 여부
+  select # 데이터 프레임의 경우 선택하고자 하는 컬럼
+)
+반환 값은 조건을 만족하는 데이터다.
+
+merge(
+  x, # 병합할 데이터 프레임
+  y, # 병합할 데이터 프레임
+)
+반환 값은 병합된 결과다.
+```
+
+## 07 데이터 정렬
+```R
+sort: 벡터를 정렬한다.
+sort(
+  x, # 정렬할 벡터
+  decreasing=FALSE, # 내름차순 여부
+  na.last=NA
+  # na.last는 NA값을 정렬한 결과의 어디에 둘 것인지를 제어한다.
+  # na.last=TRUE는 NA값을 정렬한 결과의 마지막에 두고,
+  # na.last=FALSE는 정렬한 값의 처음에 둔다
+  # 기본값은 na.last=NA는 NA값을 정렬 결과에서 제외한다.
+)
+반환 값은 정렬된 벡터다
+```
+
+sort()는 값을 정렬한 결과를 반환할 뿐, 인자로 받은 벡터 자체를 변경하지 않는다.
+
+### order()
+order()는 주어진 인자를 정렬하기 위한 각 요소의 index를 반환한다.
+
+## 08 데이터 프레임 컬럼 접근
+
+### with()
+
+```R
+with: 데이터 환경에서 주어진 표현식을 평가한다
+with(
+  data, # 환경(environment)을 만들 데이터
+  expr, # 평가할 표현식
+  ... , # 이후 함수들에 전달될 인자
+)
+반환 값은 expr의 평가값이다.
+```
+
+```r
+> print(mean(iris$Sepal.Length))
+[1] 5.843333
+> print(mean(iris$Sepal.Width))
+[1] 3.057333
+
+# with 명령을 사용하면 값에 바로 접근할 수 있다.
+
+> with(iris, {
+  print(mean(Sepal.Length))
+  print(mean(Sepal.Width))
+})
+[1] 5.843333
+[1] 3.057333
+```
+
+### within()
+
+```r
+within: 데이터 환경에서 주어진 표현식을 평가한다.
+within(
+  data, # 환경을 만들 데이터
+  expr, # 평가할 표현식 expr의 예어는 코드 블록 {...} 을 들 수 있다.
+  ... # 이후 함수들에 전달될 인자
+)
+반환 값은 expr의 평가에 따라 수정된 데이터다
+```
+
+다음은 벡터에서 결측치를 중앙값으로 치환하는 예다
+
+```R
+> x <- within(x , {
+  val <- iselse(is.na(val), median(val, na.rm=TRUE, val))
+})
+```
+위 코드에서 median() 함수 호출 시에 na.rm=TRUE를 지정했다. 이는 NA값이 포함된 채로 median()을 호출하면 결과로 NA가 나오기 때문이다.
+
+
+### attach(), detach()
+attach(), detach()는 함수 호출 후 모든 코드에서 컬럼들을 직접 접근할 수 있게한다.
+
+```r
+attach: 데이터를 R 검색 경로에 추가하여 변수명으로 바로 접근할 수 있게 한다.
+attach(
+  what # 이름으로 곧바로 접근하게 할 데이터 프레임 또는 리스트
+)
+
+detach: 데이터를 R 검색 경로에서 제거한다.
+detach(
+  what # 제거할 객체
+)
+
+search: R 객체에 대한 검색 경로를 반환한다.
+search()
+반환 값은 R 객체를 검색하는 검색 경로다.
+```
+
+```r
+> Sepal.Width
+Error: object 'Sepal.Width' not found
+> attach(iris)
+> head(Sepal.Width)
+[1] 3.5 3.0 3.2 3.1 3.6 3.9
+> detach(iris)
+> Sepal.Width
+Error: object 'Sepal.Width' not found
+```
+
+## 09 조건에 맞는 데이터의 색인 찾기
+
+```r
+which: 조건이 참인 색인을 반환한다.
+which(
+  x # 논릿값 벡터 또는 배열
+)
+반환 값은 논릿값이 참인 색인이다.
+
+which.max: 최댓값의 위치를 반환한다.
+which.max(
+  x # 숫자 벡터
+)
+반환 값은 최댓값이 저장된 색인이다.
+
+which.min: 최솟값의 위치를 반환한다.
+which.min(
+  x # 숫자 벡터
+)
+반환 값은 최솟값이 저장된 색인이다.
+```
+
+예를 들어, iris 데이터에서 Species가 setosa인 행은 subset()으로 다음과 같이 찾을 수 있다.
+
+```r
+> subset(iris, Species == "setosa")
+   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+1           5.1         3.5          1.4         0.2  setosa
+2           4.9         3.0          1.4         0.2  setosa
+3           4.7         3.2          1.3         0.2  setosa
+4           4.6         3.1          1.5         0.2  setosa
+5           5.0         3.6          1.4         0.2  setosa
+...
+```
+
+which()의 경우 조건을 만족하는 행의 index를 반환한다.
+```r
+> which(iris$Species == "setosa")
+ [1] 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30
+[31] 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50
+```
+min, max를 사용하면 index중에서 최솟값 최댓값을 찾을 수 있다.
+
+```r
+> which.min(iris$Sepal.Length)
+[1] 14
+> which.max(iris$Sepal.Length)
+[1] 132
+```
+
+## 10 그룹별 연산
+doBy가 데이터를 그룹별로 나눈 후 특정 계산을 적용하기 위한 함수들의 패키지인 반면 aggregate() 는 좀 더 일반적인 그룹별 연산을 위한 함수다. aggregate()를 사용하면 데이터를 그룹으로 묶은 후 임의의 함수를 그룹에 적용할 수 있다.
+
+```r
+aggregate: 데이터를 분할하고 각 그룹마다 요약치를 계산한다.
+aggregate(
+  x, # R 객체
+  by, # 그룹으로 묶을 값의 리스트
+  func # 그룹별로 요약치 계산에 사용할 함수
+)
+
+aggregate(
+  formula, # y ~ x 형태로 y는 계산에 사용될 값이며, x는 그룹으로 묶을 때 사용할 기준 값
+  data, # formula를 적용할 데이터
+  func
+)
+
+입력이 데이터 프레임인 경우, 반환 값은 그룹 값과 그룹의 요약치를 저장한 데이터 프레임이다.
+```
+
+아이리스 데이터 에서 종별 Sepal.Width의 평균 길이를 구하는 예를 다른 함수와 비교해보자.
+
+```r
+> aggregate(Sepal.Width ~ Species, iris, mean)
+     Species Sepal.Width
+1     setosa       3.428
+2 versicolor       2.770
+3  virginica       2.974
+
+> tapply(iris$Sepal.Length, iris$Species, mean)
+   setosa versicolor virginica
+    5.006      5.936     6.588
+```
+
+## 11 편리한 처리를 위한 데이터의 재표현
+
+보통 데이터 기록을 다음과 같이 한다.
+
+A | B | C
+--|---|--
+3 | 5 | 4
+2 | 3 | 5
+9 | 2 | 7
+
+하지만 데이터를 활용하기 위해선 다음과 같은 형태가 처리하기 쉽다.
+
+Medicine | Value
+---------|------
+A | 3
+A | 2
+A | 9
+B | 5
+B | 3
+B | 2
+C | 4
+C | 5
+C | 7
+
+이와 같은 방식으로 정리된 형태의 데이터를 'Tidy Data'라고 부른다. Tidy Data는 조작이 편하고 모델링이 편하며 시각화가 쉬운 장접이 있다. Tidy Data의 정의는 다음과 같다.
+* 각 변수는 하나의 컬럼에 해당한다.
+* 각 관찰은 한 행에 해당한다.
+* 한 관찰 유형은 하나의 테이블을 형성한다.
+
+스프레드시트 형태로 정리된 데이터와 Tidy Data 형태의 데이터 의 변환은 stack(), unstack()으로 수행할 수 있다.
+```r
+stack: 다수의 벡터를 하나의 벡터로 합치면서 관측값이 온 곳을 팩터로 명시한다.
+stack(
+  x # 리스트 또는 데이터 프레임
+)
+반환 값은 데이터 프레임이며, values에는 x가 하나로 합쳐진 값들이 저장된다. ind에는 관측값이 온 곳을 팩터로 명시한다.
+
+unstack: stack()의 역 연산
+unstack(
+  x,
+  form # ~ 왼쪽에는 관측값, 오른쪽에는 관측값이 온 곳을 표현하는 팩터를 명시한다.
+)
+```
+### MySql 및 RMySQL 환경 설정
+mysql 설치과정 생략
+
+```r
+# mysql을 설치한다.
+> install.packages("RMySQL", type="source")
+
+# rmysql을 불러온다.
+> library(RMySQL)
+```
+
+### RMySQL을 사용한 MySQL 입출력
+
+```R
+dbConnect: 데이터베이스에 접속한다.
+dbConnect(
+  drv, # 데이터베이스 드라이버 
+  user, # 사용자 이름
+  password, # 비밀번호
+  dbname, # 데이터베이스 이름
+  host # 호스트
+)
+반환 값은 데이터 베이스 접속 객체다.
+
+dbListTables: 데이터베이스의 테이블 목록을 얻는다.
+dbListTables(
+  conn # 데이터베이스 접속
+)
+반환 값은 데이터베이스의 테이블 목록이다.
+
+dbGetQuery(
+  conn, # 데이터베이스 접속
+  statement # 수행할 질의
+)
+반환 값은 질의 결과를 저장한 데이터 프레임이다.
+```
